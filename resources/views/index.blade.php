@@ -19,9 +19,8 @@
         <div id="app">
             <main role="main" class="container">
                 <div class="row justify-content-lg-center">
-                    <div class="col-lg-auto mt-5">
+                    <div class="col-lg-auto">
                         <contacts></contacts>
-
                     </div>
                 </div>
             </main>
