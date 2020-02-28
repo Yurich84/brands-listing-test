@@ -46,7 +46,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        //
+        $this->mapAllOthersToHomePage();
     }
 
     /**
@@ -76,5 +76,22 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace . '\Api')
              ->group(base_path('routes/api.php'));
+    }
+
+    /**
+     * All non matchable resources we will show standard Vue page,
+     *
+     * and redirect it through VueRoutes on client side
+     *
+     * @return void
+     */
+    protected function mapAllOthersToHomePage()
+    {
+        Route::namespace($this->namespace)
+            ->middleware('web')
+            ->group(function () {
+                Route::view('/{any}', 'spa')
+                    ->where('any', '.*');
+            });
     }
 }

@@ -1,6 +1,9 @@
 <template>
     <div class="container">
-        <table class="table" id="contact-table">
+
+        <h1 class="text-center mt-5">Brands</h1>
+
+        <table class="table" id="brand-table">
             <thead>
                 <tr>
                     <th v-for="field in fields" :key="field" @click="sortBy(field)">
@@ -9,7 +12,6 @@
                            <span v-if="sort.direction === 'desc'">&uarr;</span>
                             <span v-else>&darr;</span>
                         </span>
-
                     </th>
                 </tr>
             </thead>
@@ -20,34 +22,29 @@
                     </div>
                 </td>
             </tr>
-            <tr v-if="!loading" v-for="contact in contacts" :key="contact.id">
-                <th v-for="field in fields" :key="field">{{ contact[field] }}</th>
+            <tr v-if="!loading" v-for="brand in availableBrands" :key="brand.id">
+                <th v-for="field in fields" :key="field">{{ brand[field] }}</th>
             </tr>
         </table>
-        <button @click="readMore" v-if="showBtn" class="btn btn-outline-primary w-100">Read More</button>
     </div>
 </template>
 
 <script>
 
-    import axios from 'axios'
+    import {mapActions, mapGetters, mapMutations} from 'vuex'
+    import {BRAND_CLEAR, BRAND_FETCH_AVAILABLE, BRAND_OBTAIN_ALL} from "../../store/brand/types";
 
     export default {
         data() {
             return {
                 fields: [
-                    'age',
-                    'eyeColor',
+                    'id',
                     'name',
-                    'gender',
-                    'company',
-                    'email',
-                    'phone',
-                    'address'
+                    'description',
+                    'group',
+                    'select',
                 ],
                 loading: false,
-                showBtn: true,
-                contacts: [],
                 page: 1,
                 sort: {
                     field: 'id',
@@ -62,31 +59,12 @@
                 return value.charAt(0).toUpperCase() + value.slice(1)
             }
         },
+        computed: {
+            ...mapGetters(['availableBrands']),
+        },
         methods: {
-            fetchContacts() {
-                this.loading = true;
-                axios.get('/api/contacts', {
-                    params: {
-                        page: this.page,
-                        sort_field: this.sort.field,
-                        sort_direction: this.sort.direction
-                    }
-                }).then(response => {
-                    if(response.data.length > 0) {
-                        this.contacts = response.data
-                    } else {
-                        this.showBtn = false
-                    }
-                }).catch(error => {
-                    console.log(error)
-                }).finally(() => {
-                    this.loading = false
-                })
-            },
-            readMore() {
-                this.page++;
-                this.fetchContacts()
-            },
+            ...mapActions([BRAND_FETCH_AVAILABLE]),
+            ...mapMutations([BRAND_OBTAIN_ALL, BRAND_CLEAR]),
             sortBy(field) {
                 if(this.sort.field === field) {
                     this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc'
@@ -94,16 +72,21 @@
                     this.sort.direction = 'asc'
                 }
                 this.sort.field = field
-                this.fetchContacts()
+                this[BRAND_FETCH_AVAILABLE]
             }
         },
-        mounted() {
-            this.fetchContacts()
-        }
+        created() {
+            this[BRAND_OBTAIN_ALL] = null
+            this[BRAND_CLEAR]()
+            this[BRAND_FETCH_AVAILABLE]({
+                page: this.page
+            }).finally(() => this.isLoading = false)
+
+        },
     }
 </script>
 <style lang="scss">
-    #contact-table {
+    #brand-table {
         thead > tr > th {
             cursor: pointer;
             min-width: 100px;

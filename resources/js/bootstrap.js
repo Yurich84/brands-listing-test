@@ -1,10 +1,10 @@
-window._ = require('lodash');
+import VueRouter from 'vue-router'
+import Vuex from 'vuex'
+import {routes} from './includes/routes'
+import {store as storeOptions} from './store'
+import Notifications from 'vue-notification'
 
-/**
- * We'll load jQuery and the Bootstrap jQuery plugin which provides support
- * for JavaScript based Bootstrap features such as modals and tabs. This
- * code may be modified to fit the specific needs of your application.
- */
+window._ = require('lodash');
 
 try {
     window.Popper = require('popper.js').default;
@@ -12,12 +12,6 @@ try {
 
     require('bootstrap');
 } catch (e) {}
-
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
 
 window.axios = require('axios');
 
@@ -27,20 +21,38 @@ let token = document.head.querySelector('meta[name="csrf-token"]');
 
 window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 
+window.axios.defaults.baseURL = process.env.APP_API_URL;
 
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
 
-// import Echo from 'laravel-echo';
+export function setupPlugins(Vue) {
+    Vue.use(VueRouter)
+    Vue.use(Notifications)
+}
 
-// window.Pusher = require('pusher-js');
+export function createInstanceOptions(Vue) {
+    const router = new VueRouter({
+        routes,
+        mode: 'history',
+        scrollBehavior(to, from, savedPosition) {
+            return new Promise((resolve) => {
+                if (to.hash) {
+                    resolve({ selector: to.hash })
+                } else if (savedPosition) {
+                    resolve(savedPosition)
+                } else {
+                    resolve({x: 0, y: 0})
+                }
+            })
+        }
+    })
 
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: process.env.MIX_PUSHER_APP_KEY,
-//     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-//     encrypted: true
-// });
+    Vue.router = router
+
+    Vue.use(Vuex);
+    const store = new Vuex.Store(storeOptions)
+
+    return {
+        router,
+        store,
+    }
+}

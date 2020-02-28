@@ -1,6 +1,8 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
+use \Maatwebsite\Excel\Facades\Excel;
+use \App\Imports\BrandsImport;
+use \App\Models\Brand;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +15,9 @@ use Illuminate\Foundation\Inspiring;
 |
 */
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->describe('Display an inspiring quote');
+Artisan::command('import:brands', function () {
+    Brand::query()->truncate();
+    $filename = database_path('data.csv');
+    Excel::import(new BrandsImport, $filename);
+    $this->info('Brands were imported.');
+})->describe('Importing brands');

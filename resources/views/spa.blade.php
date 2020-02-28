@@ -14,8 +14,6 @@
 
     </head>
     <body>
-        <h1 class="text-center mt-5">Contacts Book</h1>
-
         <div id="app">
             <main role="main" class="container">
                 <div class="row justify-content-lg-center">
