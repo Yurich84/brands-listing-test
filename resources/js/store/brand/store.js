@@ -3,25 +3,21 @@ import {actions} from './actions'
 
 export const store = {
     state: {
-        brand: {
-            name: ''
-        },
-        isStoreRequesting: false,
         availableBrands: [],
-        foundBrands: [],
         brandsMeta: [],
+        brandSort: {
+            field: 'id',
+            direction: 'asc'
+        },
+        brandFilter: {
+            group: '',
+            select: ''
+        },
         isBrandEditing: false,
         isBrandSubmit: false,
-        activeBrandTab: 'form',
         isBrandSaving: false,
     },
     mutations: {
-        [brandTypes.BRAND_SET](state, brand) {
-            state.brand = brand;
-        },
-        [brandTypes.BRANDS_SET_FOUND](state, brands) {
-            state.foundBrands = brands;
-        },
         [brandTypes.BRAND_OBTAIN_ALL](state, brands) {
             state.availableBrands = state.availableBrands.concat(brands)
         },
@@ -31,18 +27,11 @@ export const store = {
         [brandTypes.BRAND_META](state, meta) {
             state.brandsMeta = meta
         },
-        [brandTypes.REQUEST_TO_STORE_BRAND_API](state) {
-            state.isStoreRequesting = true
+        [brandTypes.BRAND_SORT](state, sort) {
+            state.brandSort = sort
         },
-        [brandTypes.RESPONSE_FROM_STORE_BRAND_API](state) {
-            state.isStoreRequesting = false
-        },
-        [brandTypes.BRAND_ADD_TO_AVAILABLE](state, brand) {
-            if (state.availableBrands) {
-                state.availableBrands.unshift(brand)
-            } else {
-                state.availableBrands = [brand]
-            }
+        [brandTypes.BRAND_FILTER](state, filter) {
+            state.brandFilter = filter
         },
         [brandTypes.BRAND_UPDATE_LOCAL](state, brand) {
             if (state.availableBrands) {
@@ -66,9 +55,6 @@ export const store = {
         [brandTypes.BRAND_SET_SUBMIT](state, isBrandSubmit) {
             state.isBrandSubmit = isBrandSubmit
         },
-        [brandTypes.BRAND_SET_ACTIVE_TAB](state, activeBrandTab) {
-            state.activeBrandTab = activeBrandTab
-        },
         [brandTypes.BRAND_SET_BRAND_SAVING](state, isBrandSaving) {
             state.isBrandSaving = isBrandSaving
         },
@@ -78,10 +64,9 @@ export const store = {
         brandsMeta: state => state.brandsMeta,
         isBrandEditing: state => state.isBrandEditing,
         isBrandSubmit: state => state.isBrandSubmit,
-        activeBrandTab: state => state.activeBrandTab,
         isBrandSaving: state => state.isBrandSaving,
-        brand: state => state.brand,
-        foundBrands: state => state.foundBrands
+        brandSort: state => state.brandSort,
+        brandFilter: state => state.brandFilter,
     },
     actions
 }

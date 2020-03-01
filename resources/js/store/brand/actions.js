@@ -6,42 +6,6 @@ import {RAISE_ERROR} from "../notification/types";
 const brandApi = new BrandApi()
 
 export const actions = {
-    async [fromBrandTypes.BRAND_STORE]({commit}, {brand, successMessage}) {
-        commit(fromBrandTypes.REQUEST_TO_STORE_BRAND_API)
-        try {
-            const response = await brandApi.addBrand(brand)
-            commit(fromBrandTypes.BRAND_ADD_TO_AVAILABLE, response.data.data)
-            commit(fromNotificationTypes.NOTIFY, {
-                message: successMessage,
-                type: fromNotificationTypes.SUCCESS_MESSAGE
-            })
-
-            return response.data.data
-
-        } catch (e) {
-            commit(fromNotificationTypes.RAISE_ERROR, e.message)
-        }
-    },
-    async [fromBrandTypes.BRAND_GET]({commit}, brandId) {
-        try {
-            let response = await brandApi.fetchBrandById(brandId);
-
-            if (!response.data) {
-                throw Error('Response data is invalid');
-            }
-
-            commit(fromBrandTypes.BRAND_SET, response.data.data);
-        } catch (e) {
-            commit(fromNotificationTypes.RAISE_ERROR, e.message)
-        }
-    },
-    async [fromBrandTypes.BRAND_DELETE]({ commit }, brand) {
-        try {
-            await brandApi.delete(brand.id)
-        } catch (e) {
-            commit(RAISE_ERROR, `${e.message}`)
-        }
-    },
     async [fromBrandTypes.BRAND_FETCH_AVAILABLE]({commit}, data = null) {
         try {
             const response = await brandApi.fetchAvailable(data)
@@ -62,13 +26,5 @@ export const actions = {
             commit(fromBrandTypes.BRAND_SET_BRAND_SAVING, false)
         }
 
-    },
-    async [fromBrandTypes.BRAND_AUTOCOMPLETE]({commit}, search) {
-        try {
-            const response = await brandApi.getBrandsAutocomplete(search)
-            commit(fromBrandTypes.BRANDS_SET_FOUND, response.data.data)
-        } catch (e) {
-            commit(fromNotificationTypes.RAISE_ERROR, e.message)
-        }
     },
 }

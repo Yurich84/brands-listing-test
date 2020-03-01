@@ -3,13 +3,26 @@
 
         <h1 class="text-center mt-5">Brands</h1>
 
+        <div class="row filter">
+            <div class="col-6 form-group">
+                <label for="groupSelect">Состояние</label>
+                <select v-model="filter.group" class="form-control" id="groupSelect">
+                    <option v-for="(group, i) in brandGroupList" :value="i">{{ group }}</option>
+                </select>
+            </div>
+            <div class="col-6 form-check">
+                <input v-model="filter.select" type="checkbox" class="form-check-input" id="selectBox">
+                <label class="form-check-label" for="selectBox">Избранный</label>
+            </div>
+        </div>
+
         <table class="table" id="brand-table">
             <thead>
                 <tr>
                     <th v-for="field in fields" :key="field" @click="sortBy(field)">
                         {{ field | capitalize }}
-                        <span v-if="sort.field === field">
-                           <span v-if="sort.direction === 'desc'">&uarr;</span>
+                        <span v-if="brandSort.field === field">
+                           <span v-if="brandSort.direction === 'desc'">&uarr;</span>
                             <span v-else>&darr;</span>
                         </span>
                     </th>
@@ -22,33 +35,63 @@
                     </div>
                 </td>
             </tr>
-            <tr v-if="!loading" v-for="brand in availableBrands" :key="brand.id">
-                <th v-for="field in fields" :key="field">{{ brand[field] }}</th>
+            <tr v-if="!loading" v-for="brand in availableBrands"
+                :key="brand.id"
+                @click="$router.push({ name: 'brands_edit', params: { id: brand.id } })">
+                <th v-for="field in fields" :key="field">
+                    {{ brand[field] }}
+                </th>
             </tr>
         </table>
+
+        <paginate
+            v-model="page"
+            :page-count="brandsMeta.last_page || NaN"
+            :click-handler="pageNum => $router.push({ name: 'brands_index', params: { page: pageNum } })"
+            :prev-text="'Prev'"
+            :next-text="'Next'"
+            :container-class="'pagination'"
+            :page-class="'page-item'"
+            :page-link-class="'page-link'"
+            :prev-class="'page-item'"
+            :prev-link-class="'page-link'"
+            :next-class="'page-item'"
+            :next-link-class="'page-link'"
+            :break-view-class="'break-view'"
+            :break-view-link-class="'break-view-link'">
+        </paginate>
+
     </div>
 </template>
 
 <script>
 
+    import Paginate from 'vuejs-paginate'
     import {mapActions, mapGetters, mapMutations} from 'vuex'
-    import {BRAND_CLEAR, BRAND_FETCH_AVAILABLE, BRAND_OBTAIN_ALL} from "../../store/brand/types";
+    import {
+        BRAND_CLEAR,
+        BRAND_FETCH_AVAILABLE, BRAND_FILTER,
+        BRAND_OBTAIN_ALL,
+        BRAND_SORT
+    } from "../../store/brand/types";
 
     export default {
+        components: {
+            Paginate
+        },
         data() {
             return {
                 fields: [
                     'id',
                     'name',
-                    'description',
                     'group',
                     'select',
                 ],
                 loading: false,
-                page: 1,
-                sort: {
-                    field: 'id',
-                    direction: 'asc'
+                page: Number(this.$route.params.page) || 1,
+                filter: {
+                    group: null,
+                    select: null
                 }
             }
         },
@@ -60,29 +103,47 @@
             }
         },
         computed: {
-            ...mapGetters(['availableBrands']),
+            ...mapGetters(['availableBrands', 'brandsMeta', 'brandSort', 'brandFilter']),
         },
         methods: {
             ...mapActions([BRAND_FETCH_AVAILABLE]),
             ...mapMutations([BRAND_OBTAIN_ALL, BRAND_CLEAR]),
+            loadTable() {
+                this[BRAND_OBTAIN_ALL] = null
+                this[BRAND_CLEAR]()
+                this[BRAND_FETCH_AVAILABLE]({
+                    page: this.page,
+                    sort_field: this.brandSort.field,
+                    sort_direction: this.brandSort.direction,
+                    filter_group: this.brandFilter.group,
+                    filter_select: this.brandFilter.select,
+                }).finally(() => this.isLoading = false)
+            },
             sortBy(field) {
-                if(this.sort.field === field) {
-                    this.sort.direction = this.sort.direction === 'asc' ? 'desc' : 'asc'
+                let sort = Object.assign({}, this.brandSort)
+                if(this.brandSort.field === field) {
+                    sort.direction = this.brandSort.direction === 'asc' ? 'desc' : 'asc'
                 } else {
-                    this.sort.direction = 'asc'
+                    sort.direction = 'asc'
                 }
-                this.sort.field = field
-                this[BRAND_FETCH_AVAILABLE]
-            }
+                sort.field = field
+                this.$store.commit(BRAND_SORT, sort)
+                this.loadTable()
+            },
         },
         created() {
-            this[BRAND_OBTAIN_ALL] = null
-            this[BRAND_CLEAR]()
-            this[BRAND_FETCH_AVAILABLE]({
-                page: this.page
-            }).finally(() => this.isLoading = false)
-
+            this.loadTable()
         },
+        watch: {
+            'filter.group'() {
+                this.$store.commit(BRAND_FILTER, Object.assign({}, this.filter))
+                this.loadTable()
+            },
+            'filter.select'() {
+                this.$store.commit(BRAND_FILTER, Object.assign({}, this.filter))
+                this.loadTable()
+            }
+        }
     }
 </script>
 <style lang="scss">

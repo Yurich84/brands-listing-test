@@ -19,5 +19,5 @@ Artisan::command('import:brands', function () {
     Brand::query()->truncate();
     $filename = database_path('data.csv');
     Excel::import(new BrandsImport, $filename);
-    $this->info('Brands were imported.');
+    $this->info('Brands have been imported.');
 })->describe('Importing brands');

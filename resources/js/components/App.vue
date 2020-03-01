@@ -2,7 +2,7 @@
     <div class="app">
         <!--        App component-->
         <Notificator></Notificator>
-        <router-view></router-view>
+        <router-view :key="$route.fullPath"></router-view>
     </div>
 </template>
 

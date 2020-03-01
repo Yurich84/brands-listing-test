@@ -3,6 +3,8 @@ import * as bootstrap from './bootstrap'
 import '../sass/app.scss';
 import AppComponent from './components/App'
 
+Vue.prototype.brandGroupList = window.brandGroupList;
+
 bootstrap.setupPlugins(Vue);
 
 window.Vue = new Vue({

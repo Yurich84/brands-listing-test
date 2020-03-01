@@ -19,7 +19,7 @@ class BrandsImport implements ToModel
                 'id' => $row[0],
                 'name' => $row[1],
                 'description' => $row[2],
-                'group' => $row[3],
+                'group' => array_search($row[3], Brand::GROUP_LIST),
                 'select' => $row[4] === 'Да'
             ]);
         } else {

@@ -6,18 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BrandRequest;
 use App\Http\Resources\BrandResource;
 use App\Models\Brand;
+use Illuminate\Database\Eloquent\Builder;
 use \Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use \Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BrandController extends Controller
 {
     /**
+     * @param Request $request
      * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(Request $request)
     {
+        $sort_field = $request->get('sort_field', 'id');
+        $direction = $request->get('sort_direction', 'asc');
+
         return BrandResource::collection(
-            Brand::query()->paginate()
+            Brand::query()
+                ->when($request->filled('filter_group'), function (Builder $q) use($request) {
+                    $q->where('group', $request->filter_group);
+                })
+                ->when($request->filled('filter_select') && $request->filter_select, function (Builder $q) use($request) {
+                    $q->where('select', 1);
+                })
+                ->orderBy($sort_field, $direction)->paginate()
         );
     }
 
