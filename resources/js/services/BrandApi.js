@@ -7,10 +7,6 @@ export class BrandApi {
         this.API_ENDPOINT = '/api/brands'
     }
 
-    async addBrand(brandModel) {
-        return axios.post(this.API_ENDPOINT, brandModel)
-    }
-
     async delete(id) {
         return axios.delete(`${this.API_ENDPOINT}/${id}`)
     }
@@ -27,9 +23,5 @@ export class BrandApi {
 
     async update(brandModel, id) {
         return axios.put(`${this.API_ENDPOINT}/${id}`, brandModel)
-    }
-
-    async getBrandsAutocomplete($query) {
-        return axios.get(`${this.API_ENDPOINT}-autocomplete/?query=${$query}`)
     }
 }

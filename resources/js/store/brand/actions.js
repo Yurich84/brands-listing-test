@@ -15,16 +15,4 @@ export const actions = {
             commit(fromNotificationTypes.RAISE_ERROR, e.message)
         }
     },
-    async [fromBrandTypes.BRAND_UPDATE]({commit}, {brand, brandId}) {
-        try {
-            commit(fromBrandTypes.BRAND_SET_BRAND_SAVING, true)
-            const response = await brandApi.update(brand, brandId)
-            commit(fromBrandTypes.BRAND_UPDATE_LOCAL, response.data.data)
-        } catch (e) {
-            commit(fromNotificationTypes.RAISE_ERROR, e.message)
-        } finally {
-            commit(fromBrandTypes.BRAND_SET_BRAND_SAVING, false)
-        }
-
-    },
 }

@@ -25,7 +25,7 @@ class BrandController extends Controller
         return BrandResource::collection(
             Brand::query()
                 ->when($request->filled('filter_group'), function (Builder $q) use($request) {
-                    $q->where('group', $request->filter_group);
+                    $q->where('group', (int) $request->filter_group);
                 })
                 ->when($request->filled('filter_select') && $request->filter_select, function (Builder $q) use($request) {
                     $q->where('select', 1);

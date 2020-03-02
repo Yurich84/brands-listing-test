@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Brand;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BrandRequest extends FormRequest
@@ -13,7 +14,7 @@ class BrandRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +25,10 @@ class BrandRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            Brand::COLUMN_NAME          => 'required|string',
+            Brand::COLUMN_DESCRIPTION   => 'required|string',
+            Brand::COLUMN_GROUP         => 'integer',
+            Brand::COLUMN_SELECT        => 'integer'
         ];
     }
 }

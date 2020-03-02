@@ -39,7 +39,9 @@
                 :key="brand.id"
                 @click="$router.push({ name: 'brands_edit', params: { id: brand.id } })">
                 <th v-for="field in fields" :key="field">
-                    {{ brand[field] }}
+                    <span v-if="field === 'group'">{{ brandGroupList[brand[field]] }}</span>
+                    <span v-else-if="field === 'select'">{{ brand[field] === 1 ? 'да' : 'Нет'}}</span>
+                    <span v-else>{{ brand[field] }}</span>
                 </th>
             </tr>
         </table>
@@ -81,12 +83,7 @@
         },
         data() {
             return {
-                fields: [
-                    'id',
-                    'name',
-                    'group',
-                    'select',
-                ],
+                fields: ['id', 'name', 'group', 'select'],
                 loading: false,
                 page: Number(this.$route.params.page) || 1,
                 filter: {
@@ -107,7 +104,7 @@
         },
         methods: {
             ...mapActions([BRAND_FETCH_AVAILABLE]),
-            ...mapMutations([BRAND_OBTAIN_ALL, BRAND_CLEAR]),
+            ...mapMutations([BRAND_OBTAIN_ALL, BRAND_CLEAR, BRAND_SORT, BRAND_FILTER]),
             loadTable() {
                 this[BRAND_OBTAIN_ALL] = null
                 this[BRAND_CLEAR]()
@@ -116,7 +113,7 @@
                     sort_field: this.brandSort.field,
                     sort_direction: this.brandSort.direction,
                     filter_group: this.brandFilter.group,
-                    filter_select: this.brandFilter.select,
+                    filter_select: this.brandFilter.select ? 1 : '',
                 }).finally(() => this.isLoading = false)
             },
             sortBy(field) {
@@ -127,7 +124,7 @@
                     sort.direction = 'asc'
                 }
                 sort.field = field
-                this.$store.commit(BRAND_SORT, sort)
+                this[BRAND_SORT](sort)
                 this.loadTable()
             },
         },
@@ -136,11 +133,11 @@
         },
         watch: {
             'filter.group'() {
-                this.$store.commit(BRAND_FILTER, Object.assign({}, this.filter))
+                this[BRAND_FILTER](Object.assign({}, this.filter))
                 this.loadTable()
             },
             'filter.select'() {
-                this.$store.commit(BRAND_FILTER, Object.assign({}, this.filter))
+                this[BRAND_FILTER](Object.assign({}, this.filter))
                 this.loadTable()
             }
         }
