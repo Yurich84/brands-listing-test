@@ -7,6 +7,7 @@
             <div class="col-6 form-group">
                 <label for="groupSelect">Состояние</label>
                 <select v-model="filter.group" class="form-control" id="groupSelect">
+                    <option value="">Выберите состояние</option>
                     <option v-for="(group, i) in brandGroupList" :value="i">{{ group }}</option>
                 </select>
             </div>
