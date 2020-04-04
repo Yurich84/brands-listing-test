@@ -8,8 +8,8 @@
 </p>
 
 ## Install
-- `git clone https://github.com/Yurich84/uco-test.git`
-- `cd uco-test`
+- `git clone https://github.com/Yurich84/brands-listing-test.git`
+- `cd brands-listing-test`
 - `composer install`
 - `yarn`
 - `yarn dev`
